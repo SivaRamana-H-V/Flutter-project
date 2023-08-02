@@ -1,7 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:mobilicis/screen/filter_page.dart';
 import 'package:mobilicis/screen/search_page2.dart';
+// import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:mobilicis/screen/drawer_page.dart';
+import 'package:mobilicis/models/api_page.dart';
 
 void main() => runApp(
       const MaterialApp(
@@ -58,6 +63,9 @@ class _MyAppState extends State<MyApp> {
     'assets/oppoAD.png',
   ];
   bool isFavorite = false;
+  List<dynamic> listings = []; // Store the fetched listings data
+  bool isLoading = true; // Indicates if data is loading
+  String errorMessage = ''; // Error message if API call fails
 
   void _toggleFavorite() {
     setState(() {
@@ -67,7 +75,7 @@ class _MyAppState extends State<MyApp> {
 
   late final PageController _pageController;
   int _currentPage = 0;
-
+  final ApiService _apiService = ApiService();
   @override
   void initState() {
     super.initState();
@@ -77,6 +85,10 @@ class _MyAppState extends State<MyApp> {
         _currentPage = _pageController.page!.round();
       });
     });
+    // _loadListingsData();
+    _apiService.fetchListings(1, 10); // Fetch listings with page=1 and limit=10
+    _apiService.fetchFilters(true); // Fetch limited filters
+    _apiService.searchModel('iPhone');
   }
 
   @override
@@ -628,623 +640,825 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               ),
-              SizedBox(
-                height: 1000,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(top: 10),
-                          width: 200,
-                          height: 300,
-                          child: Column(children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 150),
-                              child: IconButton(
-                                icon: isFavorite
-                                    ? const Icon(Icons.favorite_rounded)
-                                    : const Icon(Icons.favorite_border),
-                                iconSize: 30,
-                                color: Colors.red,
-                                onPressed: _toggleFavorite,
-                              ),
-                            ),
-                            const Image(
-                              image: AssetImage("assets/List-1.jpg"),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: RichText(
-                                        text: const TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '₹ 10,500\n',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: 'Apple Iphone 12\n',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 2),
-                                  child: RichText(
-                                    text: const TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: '128 GB',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: '             Condition Good',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 7),
-                                      child: RichText(
-                                        text: const TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: 'Bhubaneswar',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: '                Jul 12th',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ]),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(top: 10),
-                          width: 200,
-                          height: 300,
-                          child: Column(children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 150),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
-                                  size: 35,
-                                ),
-                              ),
-                            ),
-                            const Image(
-                              image: AssetImage("assets/List-2.jpg"),
-                            ),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: const TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: '₹ 7,500\n',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: 'Redmi Note 12 Pro 5G\n',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                RichText(
-                                  text: const TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '128 GB',
-                                        style: TextStyle(
-                                          // fontSize: 20,
-                                          // fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: '                Condition Good',
-                                        style: TextStyle(
-                                          // fontSize: 15,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: const TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Manipur',
-                                            style: TextStyle(
-                                              // fontSize: 20,
-                                              // fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: '                  Apr 30th',
-                                            style: TextStyle(
-                                              // fontSize: 15,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ]),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(top: 10),
-                          width: 200,
-                          height: 300,
-                          child: Column(children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 150),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
-                                  size: 35,
-                                ),
-                              ),
-                            ),
-                            const Image(
-                              image: AssetImage("assets/List-5.jpg"),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: RichText(
-                                        text: const TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '₹ 120,500\n',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: 'Galaxy S22 ultra\n',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 2),
-                                  child: RichText(
-                                    text: const TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: '1000 GB',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: '           Condition Good',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 7),
-                                      child: RichText(
-                                        text: const TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: 'Bengaluru',
-                                              style: TextStyle(
-                                                // fontSize: 20,
-                                                // fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text:
-                                                  '                     Feb 20th',
-                                              style: TextStyle(
-                                                // fontSize: 15,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ]),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(top: 10),
-                          width: 200,
-                          height: 300,
-                          child: Column(children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 150),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
-                                  size: 35,
-                                ),
-                              ),
-                            ),
-                            const Image(
-                              image: AssetImage("assets/List-6.jpg"),
-                            ),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: const TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: '₹ 12,000\n',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: 'Oppo A2\n',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                RichText(
-                                  text: const TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '128 GB',
-                                        style: TextStyle(
-                                          // fontSize: 20,
-                                          // fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: '                Condition Good',
-                                        style: TextStyle(
-                                          // fontSize: 15,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: const TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Delhi',
-                                            style: TextStyle(
-                                              // fontSize: 20,
-                                              // fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text:
-                                                '                                 Oct 28th',
-                                            style: TextStyle(
-                                              // fontSize: 15,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ]),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(top: 10),
-                          width: 200,
-                          height: 300,
-                          child: Column(children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 150),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
-                                  size: 35,
-                                ),
-                              ),
-                            ),
-                            const Image(
-                              image: AssetImage("assets/List-3.jpg"),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: RichText(
-                                        text: const TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '₹ 6,000\n',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: 'Oppo A9\n',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 2),
-                                  child: RichText(
-                                    text: const TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: '128 GB',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: '             Condition Good',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 7),
-                                      child: RichText(
-                                        text: const TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: 'Dhabad',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: '                Jun 19th',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ]),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(top: 10),
-                          width: 200,
-                          height: 300,
-                          child: Column(children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 150),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
-                                  size: 35,
-                                ),
-                              ),
-                            ),
-                            const Image(
-                              image: AssetImage("assets/List-4.jpg"),
-                            ),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: const TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: '₹ 12,500\n',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: 'Galaxy A54 5G\n',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                RichText(
-                                  text: const TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '256 GB',
-                                        style: TextStyle(
-                                          // fontSize: 20,
-                                          // fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: '                Condition Good',
-                                        style: TextStyle(
-                                          // fontSize: 15,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: const TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Kollam',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: '                  Mar 17th',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ]),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              // SizedBox(
+              //   height: 1000,
+              //   child: Column(
+              //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //     children: [
+              //       Row(
+              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //         children: [
+              //           Container(
+              //             padding: const EdgeInsets.only(top: 10),
+              //             width: 200,
+              //             height: 300,
+              //             child: Column(children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 150),
+              //                 child: IconButton(
+              //                   icon: isFavorite
+              //                       ? const Icon(Icons.favorite_rounded)
+              //                       : const Icon(Icons.favorite_border),
+              //                   iconSize: 30,
+              //                   color: Colors.red,
+              //                   onPressed: _toggleFavorite,
+              //                 ),
+              //               ),
+              //               const Image(
+              //                 image: AssetImage("assets/List-1.jpg"),
+              //               ),
+              //               Column(
+              //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(left: 10),
+              //                         child: RichText(
+              //                           text: const TextSpan(
+              //                             children: [
+              //                               TextSpan(
+              //                                 text: '₹ 10,500\n',
+              //                                 style: TextStyle(
+              //                                   fontSize: 20,
+              //                                   fontWeight: FontWeight.bold,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                               TextSpan(
+              //                                 text: 'Apple Iphone 12\n',
+              //                                 style: TextStyle(
+              //                                   fontSize: 15,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   ),
+              //                   Padding(
+              //                     padding: const EdgeInsets.only(left: 2),
+              //                     child: RichText(
+              //                       text: const TextSpan(
+              //                         children: [
+              //                           TextSpan(
+              //                             text: '128 GB',
+              //                             style: TextStyle(
+              //                               color: Colors.black,
+              //                             ),
+              //                           ),
+              //                           TextSpan(
+              //                             text: '             Condition Good',
+              //                             style: TextStyle(
+              //                               color: Colors.black,
+              //                             ),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   Row(
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(left: 7),
+              //                         child: RichText(
+              //                           text: const TextSpan(
+              //                             children: [
+              //                               TextSpan(
+              //                                 text: 'Bhubaneswar',
+              //                                 style: TextStyle(
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                               TextSpan(
+              //                                 text: '                Jul 12th',
+              //                                 style: TextStyle(
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   )
+              //                 ],
+              //               ),
+              //             ]),
+              //           ),
+              //           Container(
+              //             padding: const EdgeInsets.only(top: 10),
+              //             width: 200,
+              //             height: 300,
+              //             child: Column(children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 150),
+              //                 child: IconButton(
+              //                   onPressed: () {},
+              //                   icon: const Icon(
+              //                     Icons.favorite_border,
+              //                     color: Colors.red,
+              //                     size: 35,
+              //                   ),
+              //                 ),
+              //               ),
+              //               const Image(
+              //                 image: AssetImage("assets/List-2.jpg"),
+              //               ),
+              //               Column(
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       RichText(
+              //                         text: const TextSpan(
+              //                           children: [
+              //                             TextSpan(
+              //                               text: '₹ 7,500\n',
+              //                               style: TextStyle(
+              //                                 fontSize: 20,
+              //                                 fontWeight: FontWeight.bold,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                             TextSpan(
+              //                               text: 'Redmi Note 12 Pro 5G\n',
+              //                               style: TextStyle(
+              //                                 fontSize: 15,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   ),
+              //                   RichText(
+              //                     text: const TextSpan(
+              //                       children: [
+              //                         TextSpan(
+              //                           text: '128 GB',
+              //                           style: TextStyle(
+              //                             // fontSize: 20,
+              //                             // fontWeight: FontWeight.bold,
+              //                             color: Colors.black,
+              //                           ),
+              //                         ),
+              //                         TextSpan(
+              //                           text: '                Condition Good',
+              //                           style: TextStyle(
+              //                             // fontSize: 15,
+              //                             color: Colors.black,
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                   ),
+              //                   Row(
+              //                     children: [
+              //                       RichText(
+              //                         text: const TextSpan(
+              //                           children: [
+              //                             TextSpan(
+              //                               text: 'Manipur',
+              //                               style: TextStyle(
+              //                                 // fontSize: 20,
+              //                                 // fontWeight: FontWeight.bold,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                             TextSpan(
+              //                               text: '                  Apr 30th',
+              //                               style: TextStyle(
+              //                                 // fontSize: 15,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   )
+              //                 ],
+              //               ),
+              //             ]),
+              //           ),
+              //         ],
+              //       ),
+              //       Row(
+              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //         children: [
+              //           Container(
+              //             padding: const EdgeInsets.only(top: 10),
+              //             width: 200,
+              //             height: 300,
+              //             child: Column(children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 150),
+              //                 child: IconButton(
+              //                   onPressed: () {},
+              //                   icon: const Icon(
+              //                     Icons.favorite_border,
+              //                     color: Colors.red,
+              //                     size: 35,
+              //                   ),
+              //                 ),
+              //               ),
+              //               const Image(
+              //                 image: AssetImage("assets/List-5.jpg"),
+              //               ),
+              //               Column(
+              //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(left: 10),
+              //                         child: RichText(
+              //                           text: const TextSpan(
+              //                             children: [
+              //                               TextSpan(
+              //                                 text: '₹ 120,500\n',
+              //                                 style: TextStyle(
+              //                                   fontSize: 20,
+              //                                   fontWeight: FontWeight.bold,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                               TextSpan(
+              //                                 text: 'Galaxy S22 ultra\n',
+              //                                 style: TextStyle(
+              //                                   fontSize: 15,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   ),
+              //                   Padding(
+              //                     padding: const EdgeInsets.only(left: 2),
+              //                     child: RichText(
+              //                       text: const TextSpan(
+              //                         children: [
+              //                           TextSpan(
+              //                             text: '1000 GB',
+              //                             style: TextStyle(
+              //                               color: Colors.black,
+              //                             ),
+              //                           ),
+              //                           TextSpan(
+              //                             text: '           Condition Good',
+              //                             style: TextStyle(
+              //                               color: Colors.black,
+              //                             ),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   Row(
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(left: 7),
+              //                         child: RichText(
+              //                           text: const TextSpan(
+              //                             children: [
+              //                               TextSpan(
+              //                                 text: 'Bengaluru',
+              //                                 style: TextStyle(
+              //                                   // fontSize: 20,
+              //                                   // fontWeight: FontWeight.bold,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                               TextSpan(
+              //                                 text:
+              //                                     '                     Feb 20th',
+              //                                 style: TextStyle(
+              //                                   // fontSize: 15,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   )
+              //                 ],
+              //               ),
+              //             ]),
+              //           ),
+              //           Container(
+              //             padding: const EdgeInsets.only(top: 10),
+              //             width: 200,
+              //             height: 300,
+              //             child: Column(children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 150),
+              //                 child: IconButton(
+              //                   onPressed: () {},
+              //                   icon: const Icon(
+              //                     Icons.favorite_border,
+              //                     color: Colors.red,
+              //                     size: 35,
+              //                   ),
+              //                 ),
+              //               ),
+              //               const Image(
+              //                 image: AssetImage("assets/List-6.jpg"),
+              //               ),
+              //               Column(
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       RichText(
+              //                         text: const TextSpan(
+              //                           children: [
+              //                             TextSpan(
+              //                               text: '₹ 12,000\n',
+              //                               style: TextStyle(
+              //                                 fontSize: 20,
+              //                                 fontWeight: FontWeight.bold,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                             TextSpan(
+              //                               text: 'Oppo A2\n',
+              //                               style: TextStyle(
+              //                                 fontSize: 15,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   ),
+              //                   RichText(
+              //                     text: const TextSpan(
+              //                       children: [
+              //                         TextSpan(
+              //                           text: '128 GB',
+              //                           style: TextStyle(
+              //                             // fontSize: 20,
+              //                             // fontWeight: FontWeight.bold,
+              //                             color: Colors.black,
+              //                           ),
+              //                         ),
+              //                         TextSpan(
+              //                           text: '                Condition Good',
+              //                           style: TextStyle(
+              //                             // fontSize: 15,
+              //                             color: Colors.black,
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                   ),
+              //                   Row(
+              //                     children: [
+              //                       RichText(
+              //                         text: const TextSpan(
+              //                           children: [
+              //                             TextSpan(
+              //                               text: 'Delhi',
+              //                               style: TextStyle(
+              //                                 // fontSize: 20,
+              //                                 // fontWeight: FontWeight.bold,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                             TextSpan(
+              //                               text:
+              //                                   '                                 Oct 28th',
+              //                               style: TextStyle(
+              //                                 // fontSize: 15,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   )
+              //                 ],
+              //               ),
+              //             ]),
+              //           ),
+              //         ],
+              //       ),
+              //       Row(
+              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //         children: [
+              //           Container(
+              //             padding: const EdgeInsets.only(top: 10),
+              //             width: 200,
+              //             height: 300,
+              //             child: Column(children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 150),
+              //                 child: IconButton(
+              //                   onPressed: () {},
+              //                   icon: const Icon(
+              //                     Icons.favorite_border,
+              //                     color: Colors.red,
+              //                     size: 35,
+              //                   ),
+              //                 ),
+              //               ),
+              //               const Image(
+              //                 image: AssetImage("assets/List-3.jpg"),
+              //               ),
+              //               Column(
+              //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(left: 10),
+              //                         child: RichText(
+              //                           text: const TextSpan(
+              //                             children: [
+              //                               TextSpan(
+              //                                 text: '₹ 6,000\n',
+              //                                 style: TextStyle(
+              //                                   fontSize: 20,
+              //                                   fontWeight: FontWeight.bold,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                               TextSpan(
+              //                                 text: 'Oppo A9\n',
+              //                                 style: TextStyle(
+              //                                   fontSize: 15,
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   ),
+              //                   Padding(
+              //                     padding: const EdgeInsets.only(left: 2),
+              //                     child: RichText(
+              //                       text: const TextSpan(
+              //                         children: [
+              //                           TextSpan(
+              //                             text: '128 GB',
+              //                             style: TextStyle(
+              //                               color: Colors.black,
+              //                             ),
+              //                           ),
+              //                           TextSpan(
+              //                             text: '             Condition Good',
+              //                             style: TextStyle(
+              //                               color: Colors.black,
+              //                             ),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   Row(
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(left: 7),
+              //                         child: RichText(
+              //                           text: const TextSpan(
+              //                             children: [
+              //                               TextSpan(
+              //                                 text: 'Dhabad',
+              //                                 style: TextStyle(
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                               TextSpan(
+              //                                 text: '                Jun 19th',
+              //                                 style: TextStyle(
+              //                                   color: Colors.black,
+              //                                 ),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   )
+              //                 ],
+              //               ),
+              //             ]),
+              //           ),
+              //           Container(
+              //             padding: const EdgeInsets.only(top: 10),
+              //             width: 200,
+              //             height: 300,
+              //             child: Column(children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.only(left: 150),
+              //                 child: IconButton(
+              //                   onPressed: () {},
+              //                   icon: const Icon(
+              //                     Icons.favorite_border,
+              //                     color: Colors.red,
+              //                     size: 35,
+              //                   ),
+              //                 ),
+              //               ),
+              //               const Image(
+              //                 image: AssetImage("assets/List-4.jpg"),
+              //               ),
+              //               Column(
+              //                 children: [
+              //                   Row(
+              //                     children: [
+              //                       RichText(
+              //                         text: const TextSpan(
+              //                           children: [
+              //                             TextSpan(
+              //                               text: '₹ 12,500\n',
+              //                               style: TextStyle(
+              //                                 fontSize: 20,
+              //                                 fontWeight: FontWeight.bold,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                             TextSpan(
+              //                               text: 'Galaxy A54 5G\n',
+              //                               style: TextStyle(
+              //                                 fontSize: 15,
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   ),
+              //                   RichText(
+              //                     text: const TextSpan(
+              //                       children: [
+              //                         TextSpan(
+              //                           text: '256 GB',
+              //                           style: TextStyle(
+              //                             // fontSize: 20,
+              //                             // fontWeight: FontWeight.bold,
+              //                             color: Colors.black,
+              //                           ),
+              //                         ),
+              //                         TextSpan(
+              //                           text: '                Condition Good',
+              //                           style: TextStyle(
+              //                             // fontSize: 15,
+              //                             color: Colors.black,
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                   ),
+              //                   Row(
+              //                     children: [
+              //                       RichText(
+              //                         text: const TextSpan(
+              //                           children: [
+              //                             TextSpan(
+              //                               text: 'Kollam',
+              //                               style: TextStyle(
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                             TextSpan(
+              //                               text: '                  Mar 17th',
+              //                               style: TextStyle(
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   )
+              //                 ],
+              //               ),
+              //             ]),
+              //           ),
+              //         ],
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              
+              // Container(
+              //   padding: const EdgeInsets.only(top: 10),
+              //   width: 200,
+              //   height: 300,
+              //   child: isLoading
+              //       ? const CircularProgressIndicator() // Show a loading indicator while fetching data
+              //       : errorMessage.isNotEmpty
+              //           ? Text(
+              //               errorMessage) // Show an error message if API call fails
+              //           : Column(
+              //               children: [
+              //                 Padding(
+              //                   padding: const EdgeInsets.only(left: 150),
+              //                   child: IconButton(
+              //                     icon: isFavorite
+              //                         ? const Icon(Icons.favorite_rounded)
+              //                         : const Icon(Icons.favorite_border),
+              //                     iconSize: 30,
+              //                     color: Colors.red,
+              //                     onPressed: _toggleFavorite,
+              //                   ),
+              //                 ),
+              //                 Image.network(
+              //                   // Use network image with the fetched image URL
+              //                   listings.isNotEmpty
+              //                       ? listings[0]['fullImage']
+              //                       : '',
+              //                   width: 150,
+              //                   height: 150,
+              //                 ),
+              //                 Column(
+              //                   mainAxisAlignment:
+              //                       MainAxisAlignment.spaceBetween,
+              //                   children: [
+              //                     Row(
+              //                       children: [
+              //                         Padding(
+              //                           padding:
+              //                               const EdgeInsets.only(left: 10),
+              //                           child: RichText(
+              //                             text: TextSpan(
+              //                               children: [
+              //                                 TextSpan(
+              //                                   text:
+              //                                       '₹ ${listings.isNotEmpty ? listings[0]['listingNumPrice'] : '0'}\n',
+              //                                   style: const TextStyle(
+              //                                     fontSize: 20,
+              //                                     fontWeight: FontWeight.bold,
+              //                                     color: Colors.black,
+              //                                   ),
+              //                                 ),
+              //                                 TextSpan(
+              //                                   text:
+              //                                       '${listings.isNotEmpty ? listings[0]['marketingName'] : ''}\n',
+              //                                   style: const TextStyle(
+              //                                     fontSize: 15,
+              //                                     color: Colors.black,
+              //                                   ),
+              //                                 ),
+              //                               ],
+              //                             ),
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                     Padding(
+              //                       padding: const EdgeInsets.only(left: 2),
+              //                       child: RichText(
+              //                         text: TextSpan(
+              //                           children: [
+              //                             TextSpan(
+              //                               text:
+              //                                   '${listings.isNotEmpty ? listings[0]['deviceStorage'] : ''} GB',
+              //                               style: const TextStyle(
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                             const TextSpan(
+              //                               text: '             Condition Good',
+              //                               style: TextStyle(
+              //                                 color: Colors.black,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       ),
+              //                     ),
+              //                     Row(
+              //                       children: [
+              //                         Padding(
+              //                           padding: const EdgeInsets.only(left: 7),
+              //                           child: RichText(
+              //                             text: TextSpan(
+              //                               children: [
+              //                                 TextSpan(
+              //                                   text:
+              //                                       '${listings.isNotEmpty ? listings[0]['listingLocation'] : ''}',
+              //                                   style: const TextStyle(
+              //                                     color: Colors.black,
+              //                                   ),
+              //                                 ),
+              //                                 const TextSpan(
+              //                                   text:
+              //                                       '                Jul 12th',
+              //                                   style: TextStyle(
+              //                                     color: Colors.black,
+              //                                   ),
+              //                                 ),
+              //                               ],
+              //                             ),
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                   ],
+              //                 ),
+              //               ],
+              //             ),
+              // ),
+            
             ],
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showJsonData(); // Call the function to show JSON data
+        },
+        child: const Icon(Icons.download_sharp),
+      ),
     );
+  }
+
+  // Future<void> _loadListingsData() async {
+  //   final url = Uri.parse(
+  //       'https://dev2be.oruphones.com/api/v1/global/assignment/getFilters?isLimited=true');
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {
+  //       final jsonData = jsonDecode(response.body);
+  //       final List<dynamic> listingsData = jsonData['listings'];
+  //       setState(() {
+  //         listings = listingsData;
+  //         isLoading =
+  //             false; // Data fetching is complete, set isLoading to false
+  //         errorMessage = ''; // Reset error message
+  //       });
+  //     } else {
+  //       // Handle API error
+  //       setState(() {
+  //         isLoading =
+  //             false; // Data fetching is complete, set isLoading to false
+  //         errorMessage = 'Failed to fetch data'; // Set the error message
+  //       });
+  //     }
+  //   } catch (error) {
+  //     // Handle exceptions during API call
+  //     setState(() {
+  //       isLoading = false; // Data fetching is complete, set isLoading to false
+  //       errorMessage = 'An error occurred'; // Set the error message
+  //     });
+  //   }
+  // }
+
+  Future<void> _showJsonData() async {
+    final response = await ApiService.getListings();
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      // Display the JSON data in a dialog box
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('JSON Data'),
+            content: Text(jsonData.toString()),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Handle API error here
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Failed to fetch JSON data'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
