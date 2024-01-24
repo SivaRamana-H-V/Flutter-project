@@ -1,20 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:mobilicis/screen/filter_page.dart';
 import 'package:mobilicis/screen/search_page2.dart';
-// import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mobilicis/screen/drawer_page.dart';
 import 'package:mobilicis/models/api_page.dart';
-
 void main() => runApp(
       const MaterialApp(
         debugShowCheckedModeBanner: false,
         home: MyApp(),
       ),
     );
-
 class Pagelndicator extends StatelessWidget {
   const Pagelndicator(
       {super.key, Key? keys, required this.length, required this.currentPage});
